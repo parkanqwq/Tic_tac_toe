@@ -14,6 +14,10 @@ public class Main {
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
 
+    private static int[][] aiArr = new int[5][5];
+    public static int aiX;
+    public static int aiY;
+
     public static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
