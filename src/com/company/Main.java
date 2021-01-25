@@ -158,6 +158,7 @@ public class Main {
     }
 
     private static void aiTurn() {
+        
         do {
             aiError++;
             if (aiError > 100) {
