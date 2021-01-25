@@ -6,29 +6,29 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static char[][] map;
-    public static final int SIZE = 5;
-    public static final int DOTS_TO_WIN = 4;
+    private static char[][] map;
+    private static final int SIZE = 5;
+    private static final int DOTS_TO_WIN = 4;
 
-    public static final char DOT_EMPTY = '*';
-    public static final char DOT_X = 'X';
-    public static final char DOT_O = 'O';
+    private static final char DOT_X = 'X';
+    private static final char DOT_O = 'O';
+    private static final char DOT_EMPTY = '*';
 
-    private static int[][] aiArr = new int[5][5];
-    public static int aiX;
-    public static int aiY;
+    private static int aiX;
+    private static int aiY;
+    private static int agoAiX;
+    private static int agoAiY;
+    private static int aiError;
 
-    public static Scanner scanner = new Scanner(System.in);
+    private static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // есть SIZE and DOTS_TO_WIN будет равно по 3, то игра будет класической.
-        // проверял, все работает как нужно, а так же если поле 4 и до 3 побед, включая наискосок.
 
         initMap();
         printMap();
 
-        boolean humanWin;
         boolean aiWin = false;
+        boolean humanWin = false;
 
         do {
             humanTurn();
@@ -41,13 +41,13 @@ public class Main {
             if (aiWin) break;
         } while (!mapIsFull());
 
-        if (humanWin) System.out.println("Вы победили!");
         if (aiWin) System.out.println("Вы проиграли...");
+        if (humanWin) System.out.println("Вы победили!");
         if (!(humanWin || aiWin)) System.out.println("Ничья.");
     }
 
     private static boolean checkWin(char symbol) {
-        //в строке нужное количество символов подряд
+
         for (char[] row : map) {
             int quantitySymbolInRow = 0;
             for (int i = 0; i < SIZE; i++) {
@@ -61,7 +61,7 @@ public class Main {
                 }
             }
         }
-        //в столбце нужное количество символов подряд
+
         for (int i = 0; i < SIZE; i++) {
             int quantitySymbolInRow = 0;
             for (int j = 0; j < SIZE; j++) {
@@ -75,7 +75,7 @@ public class Main {
                 }
             }
         }
-        //в диагоналях нужное количество символов подряд
+
         int quantitySymbolInRow = 0;
         for (int i = 0; i < SIZE; i++) {
             if (map[i][i] == symbol) {
@@ -87,6 +87,7 @@ public class Main {
                 return true;
             }
         }
+        quantitySymbolInRow = 0;
         for (int i = 0; i < SIZE-1; i++) {
             if (map[i][i+1] == symbol) {
                 quantitySymbolInRow++;
@@ -97,6 +98,7 @@ public class Main {
                 return true;
             }
         }
+        quantitySymbolInRow = 0;
         for (int i = 0; i < SIZE-1; i++) {
             if (map[i+1][i] == symbol) {
                 quantitySymbolInRow++;
@@ -120,6 +122,7 @@ public class Main {
                 return true;
             }
         }
+        quantitySymbolInRow = 0;
         for (int i = 0; i < SIZE-1; i++) {
             if (map[i][SIZE-i-2] == symbol) {
                 quantitySymbolInRow++;
@@ -130,6 +133,7 @@ public class Main {
                 return true;
             }
         }
+        quantitySymbolInRow = 0;
         for (int i = 0; i < SIZE-1; i++) {
             if (map[i+1][SIZE-i-1] == symbol) {
                 quantitySymbolInRow++;
@@ -154,12 +158,68 @@ public class Main {
     }
 
     private static void aiTurn() {
-        int x, y;
+        do {
+            aiError++;
+            if (aiError > 100) {
+                aiError();
+                break;
+            }
+        if(agoAiX == aiX){
+            } else {
+                if (aiX < agoAiX) {
+                    agoAiX = aiX;
+                    aiX = aiX - 3;
+                    if (aiX < 1) {
+                        agoAiX = aiX;
+                        aiX = aiX + 2;
+                    }
+                } else {
+                    agoAiX = aiX;
+                    aiX++;
+                    if (aiX > SIZE) {
+                        agoAiX = aiX;
+                        aiX = aiX - 2;
+                    }
+                }
+            }
+
+            if (agoAiY == aiY){
+            } else {
+                if (aiY < agoAiY) {
+                    agoAiY = aiY;
+                    aiY = aiY - 3;
+                    if (aiY < 1) {
+                        agoAiY = aiY;
+                        aiY = aiY + 2;
+                    }
+                } else {
+                    agoAiY = aiY;
+                    aiY++;
+                    if (aiY > SIZE) {
+                        agoAiY = aiY;
+                        aiY = aiY - 2;
+                    }
+                }
+            }
+        } while (!isCellValid(aiX, aiY));
+        if (aiError != 0){
+            map[aiX][aiY] = DOT_O;
+        }
+    }
+
+    private static void aiError(){
+        int x;
+        int y;
         do {
             x = new Random().nextInt(SIZE);
             y = new Random().nextInt(SIZE);
+            aiError++;
+            if (aiError > 100){
+                break;
+            }
         } while (!isCellValid(x, y));
         map[x][y] = DOT_O;
+        aiError = 0;
     }
 
     private static void humanTurn() {
@@ -172,6 +232,7 @@ public class Main {
             y = scanner.nextInt() -1;
         } while (!isCellValid(x, y));
         map[x][y] = DOT_X;
+        aiX = x; aiY = y;
     }
 
     private static boolean isCellValid(int x, int y) {
